@@ -1,3 +1,21 @@
-# Event Ticket Booking Backend
+Project Name
 
-Learning Backend Development using Node.js, Express.js and PostgreSQL.
+Description
+
+Tech Stack
+
+Architecture
+
+Project Requirements
+
+Database
+
+API Endpoints
+
+Authentication
+
+Installation
+
+Folder Structure
+
+Future Improvements
