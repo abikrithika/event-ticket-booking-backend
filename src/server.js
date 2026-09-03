@@ -5,8 +5,10 @@ const express=require("express");
 const pool=require("./config/db");
 
 const eventRoutes=require("./routes/eventRoutes");
+const authRoutes=require("./routes/authRoutes");
 
 const app=express();
+app.use(express.json());
 const PORT=3000;
 
 app.get('/',(req,res)=>{
@@ -14,6 +16,7 @@ app.get('/',(req,res)=>{
 });
 
 app.use("/api/events",eventRoutes);
+app.use("/api/auth",authRoutes);
 
 
 pool
