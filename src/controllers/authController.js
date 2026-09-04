@@ -1,5 +1,8 @@
 const bcrypt=require("bcryptjs");
+const jwt=require("jsonwebtoken");
 const pool=require("../config/db");
+
+
 
 const register=async(req,res)=>{
     try{
@@ -18,6 +21,7 @@ const register=async(req,res)=>{
                 message:"Email is already registered",
             });
         }
+
         const passwordHash=await bcrypt.hash(password,10);
 
         const result=await pool.query(
@@ -64,8 +68,17 @@ const login=async(req,res)=>{
                 message:"Invalid email or password",
             });
         }
+         const token=jwt.sign({
+            userId:user.id,
+            email:user.email,
+        },
+    process.env.JWT_SECRET,
+    {
+        expiresIn:"1h",
+    });
         res.status(200).json({
             message:"Login Successsfull",
+            token:token,
             user:{
                 id: user.id,
                 name: user.name,
