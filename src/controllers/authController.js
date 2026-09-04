@@ -38,6 +38,49 @@ const register=async(req,res)=>{
     }
 };
 
+const login=async(req,res)=>{
+    try{
+        const {email,password}=req.body;
+        if(!email || !password){
+            return res.status(400).json({
+                message:"Email and Password are required",
+            });
+        }
+        const result=await pool.query(
+            "SELECT * FROM app_user WHERE email=$1",
+            [email]
+        );
+        if(result.rows.length===0){
+            return res.status(401).json({
+                message: "Invalid Email or Password",
+            });
+        }
+        const user=result.rows[0];
+        const passwordMatches=await bcrypt.compare(password,
+            user.password_hash
+        );
+        if(!passwordMatches){
+            return res.status(401).json({
+                message:"Invalid email or password",
+            });
+        }
+        res.status(200).json({
+            message:"Login Successsfull",
+            user:{
+                id: user.id,
+                name: user.name,
+                email: user.email,
+            },
+        });
+    }catch(error){
+        console.error("Failed to login:",error.message);
+        res.status(500).json({
+            message:"Internal server error",
+        });
+
+    }
+};
 module.exports={
     register,
+    login,
 };
