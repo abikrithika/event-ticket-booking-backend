@@ -133,8 +133,66 @@ const addCartItem= async(req,res)=>{
         });
     }
 };
+
+const updateCartItem = async (req,res)=>{
+try{
+    const userId=req.user.userId;
+    const itemId=Number(req.params.itemId);
+    const{quantity}=req.body;
+
+    if(!Number.isInteger(itemId) || itemId<=0){
+        return res.status(400).json({
+            message:"Invalid cart item ID",
+        });
+    }
+
+    if(!Number.isInteger(quantity) || quantity<=0){
+        return res.status(400).json({
+            message:"Quantity must be a positive integer",
+        });
+    }
+    const itemResult=await pool.query(
+        `SELECT ci.id,ci.cart_id
+        FROM cart_item ci
+        JOIN cart c ON ci.cart_id=c.id
+        WHERE ci.id=$1 AND c.user_id=$2`,
+        [itemId,userId]
+    );
+    if(itemResult.rows.length===0){
+        return res.status(400).json({
+            message:"Cart item not found",
+        });
+    }
+    const cartId=itemResult.rows[0].cart_id;
+const result=await pool.query(
+    `UPDATE cart_item SET quantity=$1
+    WHERE id=$2
+    RETURNING id,cart_id,event_id,quantity`,
+    [quantity,itemId]
+);
+await pool.query(
+    `UPDATE cart
+    SET updated_at=CURRENT_TIMESTAMP
+    WHERE id=$1`,
+    [cartId]
+);
+return res.status(200).json({
+    message:"Cart item updated successfully",
+    item:result.rows[0],
+});
+
+}catch(error){
+    console.error("Failed to update cart item:",error.message);
+    res.status(500).json({
+        message:"Internal server error",
+    });
+
+}
+};
+
 module.exports={
     getCart,
     addCartItem,
+    updateCartItem,
 };
 
