@@ -189,10 +189,55 @@ return res.status(200).json({
 
 }
 };
+const deleteCartItem=async(req,res)=>{
+    try{
+        const userId=req.user.userId;
+        const itemId=Number(req.params.itemId);
 
+        if(!Number.isInteger(itemId)||itemId<=0){
+            return res.status(400).json({
+                message:"Invalid cart item id",
+            });
+        }
+        const itemResult=await pool.query(
+            `SELECT ci.id,ci.cart_id
+            FROM cart_item ci
+            JOIN cart c ON ci.cart_id=c.id
+            WHERE ci.id=$1 AND c.user_id=$2`,
+            [itemId,userId]
+        );
+
+        if(itemResult.rows.length===0){
+            return res.status(404).json({
+                message:"Cart item not found",
+            });
+        }
+        const cartId=itemResult.rows[0].cartId;
+        await pool.query(
+            `DELETE FROM cart_item
+            WHERE id=$1`,
+            [itemId]
+        );
+await pool.query(`UPDATE cart SET updated_at=CURRENT_TIMESTAMP
+    WHERE id=$1`,
+[cartId]
+);
+res.status(200).json({
+    message:"Cart item deleted successfully",
+});
+    }
+    catch(error){
+        console.error("Failed to delete cart item:",error.message);
+
+        res.status(500).json({
+            message:"Internal server error",
+        });
+    }
+};
 module.exports={
     getCart,
     addCartItem,
     updateCartItem,
+    deleteCartItem,
 };
 

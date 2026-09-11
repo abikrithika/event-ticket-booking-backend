@@ -2,7 +2,8 @@ const express=require("express");
 const {
     getCart,
     addCartItem,
-    updateCartItem
+    updateCartItem,
+    deleteCartItem
 }=require("../controllers/cartController");
 
 const authenticateToken=require("../middleware/authMiddleware");
@@ -15,6 +16,11 @@ router.post("/items",authenticateToken,addCartItem);
 router.put("/items/:itemId",
     authenticateToken,
     updateCartItem
+);
+
+router.delete("/items/:itemId",
+    authenticateToken,
+    deleteCartItem
 );
 
 module.exports=router;
