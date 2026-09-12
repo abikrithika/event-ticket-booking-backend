@@ -8,6 +8,7 @@ const eventRoutes=require("./routes/eventRoutes");
 const authRoutes=require("./routes/authRoutes");
 const cartRoutes=require("./routes/cartRoutes");
 const checkoutRoutes=require("./routes/checkoutRoutes");
+const orderRoutes=require("./routes/orderRoutes");
 
 const app=express();
 app.use(express.json());
@@ -21,6 +22,7 @@ app.use("/api/events",eventRoutes);
 app.use("/api/auth",authRoutes);
 app.use("/api/cart",cartRoutes);
 app.use("/api/checkout",checkoutRoutes);
+app.use("/api/orders",orderRoutes);
 
 pool
 .query("SELECT NOW()")
